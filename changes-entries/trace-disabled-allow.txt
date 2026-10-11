@@ -1,0 +1,3 @@
+  *) core, mod_proxy: Send GET, HEAD and OPTIONS in the Allow field of the 405
+     response to a TRACE request denied by TraceEnable, instead of an empty
+     list. PR 65357

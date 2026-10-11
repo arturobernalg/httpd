@@ -1057,6 +1057,7 @@ AP_DECLARE_NONSTD(int) ap_send_http_trace(request_rec *r)
     apr_size_t bodylen = 0;
     apr_size_t bodybuf;
     long res = -1; /* init to avoid gcc -Wall warning */
+    request_rec *cur = r;
 
     if (r->method_number != M_TRACE) {
         return DECLINED;
@@ -1071,6 +1072,12 @@ AP_DECLARE_NONSTD(int) ap_send_http_trace(request_rec *r)
     if (conf->trace_enable == AP_TRACE_DISABLE) {
         apr_table_setn(r->notes, "error-notes",
                       "TRACE denied by server configuration");
+        /* No handler has run yet, so the methods of the resource are not
+         * known. The Allow field of the 405 (RFC 9110 15.5.6) lists the
+         * ones httpd itself answers for any resource: GET and HEAD
+         * (RFC 9110 9.1) and OPTIONS.
+         */
+        ap_allow_standard_methods(cur, REPLACE_ALLOW, M_GET, M_OPTIONS, -1);
         return HTTP_METHOD_NOT_ALLOWED;
     }
 

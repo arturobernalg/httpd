@@ -1341,6 +1341,8 @@ static int proxy_handler(request_rec *r)
             apr_table_setn(r->notes, "verbose-error-to", "*");
             ap_log_rerror(APLOG_MARK, APLOG_ERR, 0, r, APLOGNO(01139)
                           "TRACE forbidden by server configuration");
+            /* The methods of the backend resource are not known here */
+            ap_allow_standard_methods(r, REPLACE_ALLOW, M_GET, M_OPTIONS, -1);
             return HTTP_METHOD_NOT_ALLOWED;
         }
 
